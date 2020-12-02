@@ -1,16 +1,23 @@
-package JDBC.DTO;
+package model.DTO;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class SubjectDto {
+@Entity
+@Table(name = "subject")
+public class SubjectDto implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "subj_Name")
     private String subjectName;
 
     public SubjectDto() {
     }
 
-    public SubjectDto(int id, String subjectName) {
-        this.id = id;
+    public SubjectDto(String subjectName) {
         this.subjectName = subjectName;
     }
 

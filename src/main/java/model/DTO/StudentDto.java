@@ -1,18 +1,30 @@
-package JDBC.DTO;
+package model.DTO;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class StudentDto {
+
+@Entity
+@Table(name = "student")
+public class StudentDto implements Serializable {
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "FIRST_NAME")
     private String firstName;
+    @Column (name = "SECOND_NAME")
     private String secondName;
+    @Column (name = "BIRTH_DATE")
     private String birthDate;
+    @Column (name = "ENTER_YEAR")
     private String enterYear;
 
     public StudentDto() {
     }
-    public StudentDto(int id, String firstName, String secondName, String birthDate, String enterYear) {
-        this.id = id;
+
+    public StudentDto(String firstName, String secondName, String birthDate, String enterYear) {
         this.firstName = firstName;
         this.secondName = secondName;
         this.birthDate = birthDate;
