@@ -1,12 +1,40 @@
-package JDBC.DTO;
+package model.DTO;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class MarkDto {
+@Entity
+@Table(name = "marks")
+public class MarkDto implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "student_Id")
     private int studentId;
+    @Column (name = "subject_Id")
     private int subjectId;
+    @Column (name = "mark")
     private int mark;
+
+    /**удалить*/
+    public MarkDto(int id, int studentId, int subjectId, int mark) {
+        this.id = id;
+        this.studentId = studentId;
+        this.subjectId = subjectId;
+        this.mark = mark;
+    }
+    /***/
+
+    public MarkDto(int studentId, int subjectId, int mark) {
+        this.studentId = studentId;
+        this.subjectId = subjectId;
+        this.mark = mark;
+    }
+
+    public MarkDto() {
+    }
 
     public int getId() {
         return id;
