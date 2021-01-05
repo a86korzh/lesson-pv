@@ -1,4 +1,4 @@
-package JDBC.DAO.Exception;
+package com.korzh86a.LessonJUnit.JDBC.DAO.Exception;
 
 import java.sql.SQLException;
 

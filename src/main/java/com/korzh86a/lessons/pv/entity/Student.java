@@ -1,18 +1,30 @@
-package JDBC.DTO;
+package com.korzh86a.lessons_pv.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class StudentDto {
+
+@Entity
+@Table(name = "student")
+public class Student implements Serializable {
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "FIRST_NAME")
     private String firstName;
+    @Column (name = "SECOND_NAME")
     private String secondName;
+    @Column (name = "BIRTH_DATE")
     private String birthDate;
+    @Column (name = "ENTER_YEAR")
     private String enterYear;
 
-    public StudentDto() {
+    public Student() {
     }
-    public StudentDto(int id, String firstName, String secondName, String birthDate, String enterYear) {
-        this.id = id;
+
+    public Student(String firstName, String secondName, String birthDate, String enterYear) {
         this.firstName = firstName;
         this.secondName = secondName;
         this.birthDate = birthDate;
@@ -68,7 +80,7 @@ public class StudentDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StudentDto that = (StudentDto) o;
+        Student that = (Student) o;
         return Objects.equals(firstName, that.firstName) &&
                 Objects.equals(secondName, that.secondName) &&
                 Objects.equals(birthDate, that.birthDate) &&

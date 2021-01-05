@@ -1,28 +1,31 @@
-CREATE DATABASE school;
+# SET GLOBAL time_zone = '+3:00';
 
-SET GLOBAL time_zone = '+3:00';
-
+CREATE DATABASE IF NOT EXISTS school;
 USE school;
 
+DROP TABLE IF EXISTS marks;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS subject;
+
 CREATE TABLE student (
-                         ID INT(10) NOT NULL AUTO_INCREMENT,
+                         ID INT NOT NULL AUTO_INCREMENT,
                          FIRST_NAME VARCHAR (64) NOT NULL,
                          SECOND_NAME VARCHAR (64) NOT NULL,
                          BIRTH_DATE DATE,
-                         ENTER_YEAR INT (4),
+                         ENTER_YEAR INT,
                          PRIMARY KEY (ID)
 );
 
 CREATE TABLE subject (
-                         ID INT(10) NOT NULL AUTO_INCREMENT,
+                         ID INT NOT NULL AUTO_INCREMENT,
                          SUBJ_NAME VARCHAR (64) NOT NULL,
                          PRIMARY KEY (ID)
 );
 
 CREATE TABLE marks (
-                       ID INT(10) NOT NULL AUTO_INCREMENT,
-                       STUDENT_ID INT(10) NOT NULL,
-                       SUBJECT_ID INT(10) NOT NULL,
+                       ID INT NOT NULL AUTO_INCREMENT,
+                       STUDENT_ID INT NOT NULL,
+                       SUBJECT_ID INT NOT NULL,
                        MARK INT,
                        PRIMARY KEY (ID),
                        FOREIGN KEY (STUDENT_ID) REFERENCES student(ID),

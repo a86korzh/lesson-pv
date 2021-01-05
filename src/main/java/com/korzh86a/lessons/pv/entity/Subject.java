@@ -1,16 +1,23 @@
-package JDBC.DTO;
+package com.korzh86a.lessons_pv.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class SubjectDto {
+@Entity
+@Table(name = "subject")
+public class Subject implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "subj_Name")
     private String subjectName;
 
-    public SubjectDto() {
+    public Subject() {
     }
 
-    public SubjectDto(int id, String subjectName) {
-        this.id = id;
+    public Subject(String subjectName) {
         this.subjectName = subjectName;
     }
 
@@ -39,7 +46,7 @@ public class SubjectDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SubjectDto that = (SubjectDto) o;
+        Subject that = (Subject) o;
         return subjectName.equals(that.subjectName);
     }
 

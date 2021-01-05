@@ -1,12 +1,31 @@
-package JDBC.DTO;
+package com.korzh86a.lessons_pv.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class MarkDto {
+@Entity
+@Table(name = "marks")
+public class Mark implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
     private int id;
+    @Column (name = "student_Id")
     private int studentId;
+    @Column (name = "subject_Id")
     private int subjectId;
+    @Column (name = "mark")
     private int mark;
+
+    public Mark(int studentId, int subjectId, int mark) {
+        this.studentId = studentId;
+        this.subjectId = subjectId;
+        this.mark = mark;
+    }
+
+    public Mark() {
+    }
 
     public int getId() {
         return id;
@@ -49,10 +68,10 @@ public class MarkDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MarkDto markDto = (MarkDto) o;
-        return studentId == markDto.studentId &&
-                subjectId == markDto.subjectId &&
-                mark == markDto.mark;
+        Mark mark = (Mark) o;
+        return studentId == mark.studentId &&
+                subjectId == mark.subjectId &&
+                this.mark == mark.mark;
     }
 
     @Override
