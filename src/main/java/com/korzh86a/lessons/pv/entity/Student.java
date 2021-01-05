@@ -1,4 +1,4 @@
-package com.korzh86a.lessons_pv.entity;
+package com.korzh86a.lessons.pv.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;

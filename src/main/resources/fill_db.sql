@@ -18,7 +18,7 @@ CREATE TABLE student (
 
 CREATE TABLE subject (
                          ID INT NOT NULL AUTO_INCREMENT,
-                         SUBJ_NAME VARCHAR (64) NOT NULL,
+                         SUBJ_NAME VARCHAR (64) NOT NULL UNIQUE,
                          PRIMARY KEY (ID)
 );
 

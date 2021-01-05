@@ -1,9 +1,9 @@
-package com.korzh86a.LessonJUnit.JDBC.DAO.Exception;
+package com.korzh86a.lessons.pv.dao;
 
 import java.sql.SQLException;
 
-public class DaoException extends SQLException {
-    public DaoException(String reason, Throwable cause) {
+public class SchoolDaoException extends SQLException {
+    public SchoolDaoException(String reason, Throwable cause) {
         super(reason, cause);
     }
 }

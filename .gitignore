@@ -15,5 +15,8 @@ lib
 # pass
 src/main/resources/hibernate.cfg.xml
 
+# etc
+notes.docx
+
 #git
 .git
