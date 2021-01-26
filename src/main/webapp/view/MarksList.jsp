@@ -24,9 +24,9 @@
                 <td><c:out value="${marks.key.subjectName}" /></td>
 
                 <td>
-                    <c:forEach var="markDto" items="${marks.value}">
-                        <c:if test="${markDto.mark>0}">
-                            <c:out value="${markDto.mark} "/>
+                    <c:forEach var="mark" items="${marks.value}">
+                        <c:if test="${mark.mark>0}">
+                            <c:out value="${mark.mark}, "/>
                         </c:if>
                     </c:forEach>
                 </td>

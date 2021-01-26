@@ -1,9 +1,7 @@
 # Maven
 target
-META-INF
-
-# Ignore Gradle GUI config
-gradle-app.setting
+lib
+.run
 
 # IntelliJ
 .idea
@@ -15,7 +13,10 @@ gradle-app.setting
 *.log
 
 # pass
-src/main/resources/app.properties
+src/main/resources/hibernate.cfg.xml
+
+# etc
+notes.docx
 
 #git
 .git
