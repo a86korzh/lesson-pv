@@ -3,6 +3,7 @@ package com.korzh86a.lessons.pv.dao;
 import com.korzh86a.lessons.pv.entity.Mark;
 import com.korzh86a.lessons.pv.entity.Student;
 import com.korzh86a.lessons.pv.entity.Subject;
+import com.korzh86a.lessons.pv.entity.SubjectWithMarks;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -29,6 +30,7 @@ public class SchoolDao implements AutoCloseable{
             configuration.addAnnotatedClass(Student.class)
                     .addAnnotatedClass(Subject.class)
                     .addAnnotatedClass(Mark.class)
+                    .addAnnotatedClass(SubjectWithMarks.class)
                     .configure("hibernate.cfg.xml");
 
             ServiceRegistry serviceRegistryObj = new StandardServiceRegistryBuilder()
@@ -40,47 +42,120 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public void add(Object schoolObject) throws SchoolDaoException {
+    public long getRowsAmount (String schoolObject) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+
+        String queryStr = "SELECT COUNT(e) FROM Student e";
+
+        if (schoolObject.equals("Subject")) {
+            queryStr = "SELECT COUNT(e) FROM Subject e";
+        }
+
+        long result = (long)session.createQuery(queryStr).getSingleResult();
+
+        transaction.commit();
+        if (session!=null) {
+            session.close();
+        }
+
+        return result;
+    }
+
+    public List<Student> getAllStudents(int representedStudentsAmount, int actualPageFirstRow)
+            throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
-            session.save(schoolObject);
+
+            Query<Student> query = session.createQuery("FROM Student order by secondName");
+            query.setMaxResults(representedStudentsAmount);
+            query.setFirstResult(actualPageFirstRow);
+
+            List<Student> result = query.list();
+
             transaction.commit();
             if (session!=null) {
                 session.close();
             }
+
+            return result;
+
+        } catch (Exception e) {
+            throw new SchoolDaoException("Exception while get all student", e);
+        }
+    }
+
+    public List<Subject> getAllSubjects() throws SchoolDaoException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+
+            List<Subject> subjects = session.createQuery("FROM Subject").list();
+
+            transaction.commit();
+            if (session!=null) {
+                session.close();
+            }
+
+            return subjects;
+
+        } catch (Exception e) {
+            throw new SchoolDaoException("Exception while get all subject", e);
+        }
+    }
+
+    public Map<Subject, List<Mark>> getStudentMarks(Student student) throws SchoolDaoException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            Student temp = session.get(Student.class, student.getId());
+
+            transaction.commit();
+            if (session!=null) {
+                session.close();
+            }
+
+            Map<Subject, List<Mark>> result = new HashMap<>();
+            for (SubjectWithMarks s : temp.getSubjectsWithMarks()) {
+                result.put(s.getSubject(), s.getMarks());
+            }
+
+            return result;
+
+        } catch (Exception e) {
+            throw new SchoolDaoException("Exception while get marks", e);
+        }
+    }
+
+    public void addSchoolObject(Object schoolObject) throws SchoolDaoException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            session.save(schoolObject);
+
+            transaction.commit();
+            if (session!=null) {
+                session.close();
+            }
+
         } catch (Exception e) {
             throw new SchoolDaoException("Exception while add entity", e);
         }
     }
 
-    public void update(Object schoolObject) throws SchoolDaoException {
+    public void updateSchoolObject(Object schoolObject) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
             session.update(schoolObject);
+
             transaction.commit();
             if (session!=null) {
                 session.close();
             }
-        } catch (HibernateException e) {
         } catch (Exception e) {
             throw new SchoolDaoException("Exception while update entity", e);
-        }
-    }
-
-    public List<Student> getAllStudents() throws SchoolDaoException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            List<Student> students = session.createQuery("FROM Student").list();
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-            return students;
-        } catch (Exception e) {
-            throw new SchoolDaoException("Exception while get all student", e);
         }
     }
 
@@ -89,63 +164,48 @@ public class SchoolDao implements AutoCloseable{
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
             Student student = session.get(Student.class, studentId);
+
             transaction.commit();
             if (session!=null) {
                 session.close();
             }
+
             return student;
+
         } catch (Exception e) {
             throw new SchoolDaoException("Exception while get student", e);
         }
     }
 
-    public Map<Subject, List<Mark>> getStudentMarks(Student student) throws SchoolDaoException {
+    public Subject getSubject(int studentId) throws SchoolDaoException {
         try {
-            Map<Subject, List<Mark>> map = new HashMap<>();
-
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
-
-            Query query = session.createQuery("FROM Mark WHERE studentId = :studentId");
-            query.setParameter("studentId", student.getId());
-            List<Mark> marks = query.list();
-
-            Subject subject;
-            List<Mark> temp;
-
-            for (Mark m : marks) {
-                subject = session.get(Subject.class, m.getSubjectId());
-
-                if (map.containsKey(subject)){
-                    temp = map.get(subject);
-                } else {
-                    temp = new ArrayList<>();
-                }
-
-                temp.add(m);
-                map.put(subject, temp);
-            }
+            Subject subject = session.get(Subject.class, studentId);
 
             transaction.commit();
             if (session!=null) {
                 session.close();
             }
-            return map;
+
+            return subject;
+
         } catch (Exception e) {
-            throw new SchoolDaoException("Exception while get marks", e);
+            throw new SchoolDaoException("Exception while get subject", e);
         }
     }
 
-    public void removeStudent(Student student) throws SchoolDaoException {
+    public void removeStudent(int studentId) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
 
-            Query query = session.createQuery("DELETE FROM Mark WHERE studentId = :studentId");
-            query.setParameter("studentId", student.getId());
-            query.executeUpdate();
+            Query theQuery =
+                    session.createQuery("delete from Student where id=:studentId");
+            theQuery.setParameter("studentId", studentId);
 
-            session.delete(student);
+            theQuery.executeUpdate();
+
             transaction.commit();
             if (session!=null) {
                 session.close();
@@ -155,83 +215,23 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public List<Subject> getAllSubjects() throws SchoolDaoException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            List<Subject> subjects = session.createQuery("FROM Subject").list();
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-            return subjects;
-        } catch (Exception e) {
-            throw new SchoolDaoException("Exception while get all subject", e);
-        }
-    }
-
-    public Subject getSubject(int studentId) throws SchoolDaoException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            Subject subject = session.get(Subject.class, studentId);
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-            return subject;
-        } catch (Exception e) {
-            throw new SchoolDaoException("Exception while get subject", e);
-        }
-    }
-
-    public void removeSubjectById(int subjectId) throws SchoolDaoException {
+    public void removeSubject(int subjectId) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
 
-            Query query = session.createQuery("DELETE FROM Mark WHERE subjectId = :subjectId");
-            query.setParameter("subjectId", subjectId);
-            query.executeUpdate();
+            Query theQuery =
+                    session.createQuery("delete from Subject where id=:subjectId");
+            theQuery.setParameter("subjectId", subjectId);
 
-            Subject subject = session.get(Subject.class, subjectId);
-            session.delete(subject);
+            theQuery.executeUpdate();
+
             transaction.commit();
             if (session!=null) {
                 session.close();
             }
         } catch (Exception e) {
             throw new SchoolDaoException("Exception while remove subject", e);
-        }
-    }
-
-    public Mark getMark(int markId) throws SchoolDaoException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            Mark mark = session.get(Mark.class, markId);
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-            return mark;
-        } catch (Exception e) {
-            throw new SchoolDaoException("Exception while get mark", e);
-        }
-    }
-
-    public void removeMarkById(int markId) throws SchoolDaoException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            Mark mark = session.get(Mark.class, markId);
-            session.delete(mark);
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-        } catch (Exception e) {
-            throw new SchoolDaoException("Exception while remove mark", e);
         }
     }
 

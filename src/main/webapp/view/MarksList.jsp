@@ -26,7 +26,7 @@
                 <td>
                     <c:forEach var="mark" items="${marks.value}">
                         <c:if test="${mark.mark>0}">
-                            <c:out value="${mark.mark} "/>
+                            <c:out value="${mark.mark}, "/>
                         </c:if>
                     </c:forEach>
                 </td>

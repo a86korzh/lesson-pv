@@ -5,77 +5,50 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "marks")
+@Table(name = "mark")
 public class Mark implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "id")
     private int id;
-    @Column (name = "student_Id")
-    private int studentId;
-    @Column (name = "subject_Id")
-    private int subjectId;
+
     @Column (name = "mark")
     private int mark;
 
-    public Mark(int studentId, int subjectId, int mark) {
-        this.studentId = studentId;
-        this.subjectId = subjectId;
-        this.mark = mark;
-    }
+    @ManyToOne(fetch=FetchType.EAGER,
+            cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name="subject_with_marks_id")
+    private SubjectWithMarks subjectWithMarks;
 
     public Mark() {
+    }
+    public Mark(int mark) {
+        this.mark = mark;
     }
 
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public int getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId(int subjectId) {
-        this.subjectId = subjectId;
     }
 
     public int getMark() {
         return mark;
     }
-
     public void setMark(int mark) {
         this.mark = mark;
     }
 
+    public SubjectWithMarks getSubjectWithMarks() {
+        return subjectWithMarks;
+    }
+    public void setSubjectWithMarks(SubjectWithMarks subjectWithMarks) {
+        this.subjectWithMarks = subjectWithMarks;
+    }
+
     @Override
     public String toString() {
-        return mark + "";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Mark mark = (Mark) o;
-        return studentId == mark.studentId &&
-                subjectId == mark.subjectId &&
-                this.mark == mark.mark;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(studentId, subjectId, mark);
+        return "mark= " + mark;
     }
 }

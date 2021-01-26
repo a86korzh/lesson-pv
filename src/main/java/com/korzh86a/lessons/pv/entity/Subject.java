@@ -2,6 +2,8 @@ package com.korzh86a.lessons.pv.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -11,12 +13,15 @@ public class Subject implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "id")
     private int id;
+
     @Column (name = "subj_Name")
     private String subjectName;
 
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+    private List<SubjectWithMarks> subjectsWithMarks;
+
     public Subject() {
     }
-
     public Subject(String subjectName) {
         this.subjectName = subjectName;
     }
@@ -24,7 +29,6 @@ public class Subject implements Serializable {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -32,9 +36,24 @@ public class Subject implements Serializable {
     public String getSubjectName() {
         return subjectName;
     }
-
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
+    }
+
+    public List<SubjectWithMarks> getSubjectsWithMarks() {
+        return subjectsWithMarks;
+    }
+    public void setSubjectsWithMarks(List<SubjectWithMarks> subjectsWithMarks) {
+        this.subjectsWithMarks = subjectsWithMarks;
+    }
+
+    public void addSubjectsWithMarks(SubjectWithMarks subjectWithMarks) {
+
+        if (subjectsWithMarks == null) {
+            subjectsWithMarks = new ArrayList<>();
+        }
+
+        subjectsWithMarks.add(subjectWithMarks);
     }
 
     @Override
