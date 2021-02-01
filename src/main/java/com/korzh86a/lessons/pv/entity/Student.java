@@ -1,6 +1,8 @@
 package com.korzh86a.lessons.pv.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class Student implements Serializable {
     @Column (name = "ENTER_YEAR")
     private String enterYear;
 
-    @OneToMany(mappedBy = "student", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+    @OneToMany(mappedBy = "student", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
     private List<SubjectWithMarks> subjectsWithMarks;
 
     public Student() {

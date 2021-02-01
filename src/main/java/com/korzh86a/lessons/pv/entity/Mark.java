@@ -15,7 +15,7 @@ public class Mark implements Serializable {
     @Column (name = "mark")
     private int mark;
 
-    @ManyToOne(fetch=FetchType.EAGER,
+    @ManyToOne(fetch=FetchType.LAZY,
             cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name="subject_with_marks_id")
     private SubjectWithMarks subjectWithMarks;

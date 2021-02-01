@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Configurable
 public class SchoolServlet extends HttpServlet {
@@ -73,23 +75,13 @@ public class SchoolServlet extends HttpServlet {
 
 	private void allStudents(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException, SchoolDaoException {
-		long studentsAmount = schoolDao.getRowsAmount("Student");
+		long studentsAmount = schoolDao.getStudentAmount();
 
-		String representedStudentsAmountStr = req.getParameter("representedStudentsAmount");
-		int representedStudentsAmount;
-		if (representedStudentsAmountStr == null) {
-			representedStudentsAmount = 5;
-		} else if ((representedStudentsAmount = Integer.parseInt(representedStudentsAmountStr)) < 1){
-			representedStudentsAmount = 5;
-		}
+		int representedStudentsAmount = validateValue(
+				req.getParameter("representedStudentsAmount"), 5);
 
-		String actualPageFirstRowStr = req.getParameter("actualPageFirstRow");
-		int actualPageFirstRow;
-		if (actualPageFirstRowStr == null) {
-			actualPageFirstRow = 0;
-		} else if ((actualPageFirstRow = Integer.parseInt(actualPageFirstRowStr)) < 1){
-			actualPageFirstRow = 0;
-		}
+		int actualPageFirstRow = validateValue(
+				req.getParameter("actualPageFirstRow"), 0);
 
 		List<Student> studentsList = schoolDao.getAllStudents(representedStudentsAmount, actualPageFirstRow);
 
@@ -100,6 +92,16 @@ public class SchoolServlet extends HttpServlet {
 
 		RequestDispatcher dispatcher = req.getRequestDispatcher("view/StudentList.jsp");
 		dispatcher.forward(req, resp);
+	}
+
+	private int validateValue(String strValue, int defaultValue) {
+		int result;
+		if (strValue == null) {
+			result = defaultValue;
+		} else if ((result = Integer.parseInt(strValue)) < 1){
+			result = defaultValue;
+		}
+		return result;
 	}
 
 	private void allSubjects(HttpServletRequest req, HttpServletResponse resp)
@@ -142,9 +144,85 @@ public class SchoolServlet extends HttpServlet {
 				req.getParameter("enterYear")
 		);
 
+		checkStudent(student);
+
 		schoolDao.addSchoolObject(student);
 
 		resp.sendRedirect("list");
+	}
+
+	private void checkStudent (Student student) throws SchoolDaoException {
+		try {
+			if (student.getFirstName() == null || student.getSecondName() == null ||
+					student.getBirthDate() == null || student.getEnterYear() == null) {
+				throw new SchoolDaoException("fill all data");
+			}
+
+			int enterYear = Integer.parseInt(student.getEnterYear());
+			if (enterYear > 2100 || enterYear < 1900){
+				throw new SchoolDaoException("enter correct entered year");
+			}
+
+			if (!validateDate(student.getBirthDate())) {
+				throw new SchoolDaoException("enter correct birth date");
+			}
+
+		} catch (NumberFormatException e) {
+			throw new SchoolDaoException("enter correct entered year");
+		}
+	}
+
+	private boolean validateDate (String date){
+		Pattern pattern = Pattern.compile("((19|20)\\d\\d)[-](0?[1-9]|[12][0-9]|3[01])[-](0?[1-9]|1[012])");
+		Matcher matcher = pattern.matcher(date);
+
+		if(matcher.matches()){
+			matcher.reset();
+
+			if(matcher.find()){
+				String day = matcher.group(3);
+				String month = matcher.group(2);
+				int year = Integer.parseInt(matcher.group(1));
+
+				if (day.equals("31") &&
+						(month.equals("4") || month .equals("6") || month.equals("9") ||
+								month.equals("11") || month.equals("04") || month .equals("06") ||
+								month.equals("09"))) {
+					return false;
+				}
+
+				else if (month.equals("2") || month.equals("02")) {
+					if(year % 4==0){
+						if(day.equals("30") || day.equals("31")){
+							return false;
+						}
+						else{
+							return true;
+						}
+					}
+					else{
+
+						if(day.equals("29")||day.equals("30")||day.equals("31")){
+							return false;
+						}
+						else{
+							return true;
+						}
+					}
+				}
+
+				else{
+					return true;
+				}
+			}
+
+			else{
+				return false;
+			}
+		}
+		else{
+			return false;
+		}
 	}
 
 	private void showNewSubjectForm(HttpServletRequest req, HttpServletResponse resp)
@@ -182,8 +260,9 @@ public class SchoolServlet extends HttpServlet {
 				req.getParameter("enterYear")
 		);
 		student.setId(Integer.parseInt(req.getParameter("id")));
+		checkStudent(student);
 
-		schoolDao.updateSchoolObject(student);
+		schoolDao.updateSchoolDao(student);
 
 		resp.sendRedirect("list");
 	}
@@ -204,7 +283,7 @@ public class SchoolServlet extends HttpServlet {
 		subject.setId(Integer.parseInt(req.getParameter("id")));
 		subject.setSubjectName(req.getParameter("subject"));
 
-		schoolDao.updateSchoolObject(subject);
+		schoolDao.updateSchoolDao(subject);
 
 		resp.sendRedirect("/allSubjects");
 	}

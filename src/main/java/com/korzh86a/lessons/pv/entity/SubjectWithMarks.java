@@ -13,17 +13,17 @@ public class SubjectWithMarks implements Serializable {
     @Column (name = "id")
     private int id;
 
-    @ManyToOne(fetch=FetchType.EAGER,
+    @ManyToOne(fetch=FetchType.LAZY,
             cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name="subject_id")
     private Subject subject;
 
-    @ManyToOne(fetch=FetchType.EAGER,
+    @ManyToOne(fetch=FetchType.LAZY,
             cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name="student_id")
     private Student student;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy = "subjectWithMarks", cascade = CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy = "subjectWithMarks", cascade = CascadeType.ALL)
     private List<Mark> marks;
 
     public SubjectWithMarks() {

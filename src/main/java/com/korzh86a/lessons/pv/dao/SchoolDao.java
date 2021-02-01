@@ -42,25 +42,37 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public long getRowsAmount (String schoolObject) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        public long getSubjectAmount () {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
 
-        String queryStr = "SELECT COUNT(e) FROM Student e";
+            String queryStr = "SELECT COUNT(e) FROM Subject e";
 
-        if (schoolObject.equals("Subject")) {
-            queryStr = "SELECT COUNT(e) FROM Subject e";
+            long result = (long)session.createQuery(queryStr).getSingleResult();
+
+            transaction.commit();
+            if (session!=null) {
+                session.close();
+            }
+
+            return result;
         }
 
-        long result = (long)session.createQuery(queryStr).getSingleResult();
+        public long getStudentAmount () {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
 
-        transaction.commit();
-        if (session!=null) {
-            session.close();
+            String queryStr = "SELECT COUNT(e) FROM Student e";
+
+            long result = (long)session.createQuery(queryStr).getSingleResult();
+
+            transaction.commit();
+            if (session!=null) {
+                session.close();
+            }
+
+            return result;
         }
-
-        return result;
-    }
 
     public List<Student> getAllStudents(int representedStudentsAmount, int actualPageFirstRow)
             throws SchoolDaoException {
@@ -144,7 +156,7 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public void updateSchoolObject(Object schoolObject) throws SchoolDaoException {
+    public void updateSchoolDao(Object schoolObject) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
