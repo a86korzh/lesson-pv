@@ -23,7 +23,7 @@ public class SubjectWithMarks implements Serializable {
     @JoinColumn(name="student_id")
     private Student student;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy = "subjectWithMarks", cascade = CascadeType.ALL)
+    @OneToMany(fetch=FetchType.EAGER, mappedBy = "subjectWithMarks", cascade = CascadeType.ALL)
     private List<Mark> marks;
 
     public SubjectWithMarks() {

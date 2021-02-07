@@ -4,7 +4,6 @@ import com.korzh86a.lessons.pv.entity.Mark;
 import com.korzh86a.lessons.pv.entity.Student;
 import com.korzh86a.lessons.pv.entity.Subject;
 import com.korzh86a.lessons.pv.entity.SubjectWithMarks;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -14,8 +13,6 @@ import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +20,12 @@ import java.util.Map;
 @Component
 public class SchoolDao implements AutoCloseable{
     private SessionFactory sessionFactory;
+    private final String SUBJECT_AMOUNT = "SELECT COUNT(e) FROM Subject e";
+    private final String STUDENT_AMOUNT = "SELECT COUNT(e) FROM Student e";
+    private final String ALL_STUDENTS = "FROM Student order by secondName";
+    private final String ALL_SUBJECT = "FROM Subject";
+    private final String REMOVE_STUDENT = "delete from Student where id=:studentId";
+    private final String REMOVE_SUBJECT = "delete from Subject where id=:subjectId";
 
     public SchoolDao() throws SchoolDaoException {
         try {
@@ -42,51 +45,41 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-        public long getSubjectAmount () {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
+    public long getSubjectAmount () {
+        Session session = sessionFactory.openSession();
 
-            String queryStr = "SELECT COUNT(e) FROM Subject e";
+        long result = (long)session.createQuery(SUBJECT_AMOUNT).getSingleResult();
 
-            long result = (long)session.createQuery(queryStr).getSingleResult();
-
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-
-            return result;
+        if (session!=null) {
+            session.close();
         }
 
-        public long getStudentAmount () {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
+        return result;
+    }
 
-            String queryStr = "SELECT COUNT(e) FROM Student e";
+    public long getStudentAmount () {
+        Session session = sessionFactory.openSession();
 
-            long result = (long)session.createQuery(queryStr).getSingleResult();
+        long result = (long)session.createQuery(STUDENT_AMOUNT).getSingleResult();
 
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
-
-            return result;
+        if (session!=null) {
+            session.close();
         }
+
+        return result;
+    }
 
     public List<Student> getAllStudents(int representedStudentsAmount, int actualPageFirstRow)
             throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
 
-            Query<Student> query = session.createQuery("FROM Student order by secondName");
+            Query<Student> query = session.createQuery(ALL_STUDENTS);
             query.setMaxResults(representedStudentsAmount);
             query.setFirstResult(actualPageFirstRow);
 
             List<Student> result = query.list();
 
-            transaction.commit();
             if (session!=null) {
                 session.close();
             }
@@ -101,11 +94,9 @@ public class SchoolDao implements AutoCloseable{
     public List<Subject> getAllSubjects() throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
 
-            List<Subject> subjects = session.createQuery("FROM Subject").list();
+            List<Subject> subjects = session.createQuery(ALL_SUBJECT).list();
 
-            transaction.commit();
             if (session!=null) {
                 session.close();
             }
@@ -120,17 +111,15 @@ public class SchoolDao implements AutoCloseable{
     public Map<Subject, List<Mark>> getStudentMarks(Student student) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
             Student temp = session.get(Student.class, student.getId());
-
-            transaction.commit();
-            if (session!=null) {
-                session.close();
-            }
 
             Map<Subject, List<Mark>> result = new HashMap<>();
             for (SubjectWithMarks s : temp.getSubjectsWithMarks()) {
                 result.put(s.getSubject(), s.getMarks());
+            }
+
+            if (session!=null) {
+                session.close();
             }
 
             return result;
@@ -140,13 +129,11 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public void addSchoolObject(Object schoolObject) throws SchoolDaoException {
+    public void addSchoolDao (Object schoolObject) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
             session.save(schoolObject);
 
-            transaction.commit();
             if (session!=null) {
                 session.close();
             }
@@ -156,13 +143,40 @@ public class SchoolDao implements AutoCloseable{
         }
     }
 
-    public void updateSchoolDao(Object schoolObject) throws SchoolDaoException {
+    public void updateStudent(Student studentForm) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
-            session.update(schoolObject);
+
+            Student student = session.get(Student.class, studentForm.getId());
+            student.setEnterYear(studentForm.getEnterYear());
+            student.setFirstName(studentForm.getFirstName());
+            student.setSecondName(studentForm.getSecondName());
+            student.setBirthDate(studentForm.getBirthDate());
+            System.out.println(student);
+            session.update(student);
 
             transaction.commit();
+
+            if (session!=null) {
+                session.close();
+            }
+        } catch (Exception e) {
+            throw new SchoolDaoException("Exception while update entity", e);
+        }
+    }
+
+    public void updateSubject(Subject subjectForm) throws SchoolDaoException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+
+            Subject subject = session.get(Subject.class, subjectForm.getId());
+            subject.setSubjectName(subjectForm.getSubjectName());
+            session.update(subject);
+
+            transaction.commit();
+
             if (session!=null) {
                 session.close();
             }
@@ -174,10 +188,8 @@ public class SchoolDao implements AutoCloseable{
     public Student getStudent(int studentId) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
             Student student = session.get(Student.class, studentId);
 
-            transaction.commit();
             if (session!=null) {
                 session.close();
             }
@@ -192,10 +204,8 @@ public class SchoolDao implements AutoCloseable{
     public Subject getSubject(int studentId) throws SchoolDaoException {
         try {
             Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
             Subject subject = session.get(Subject.class, studentId);
 
-            transaction.commit();
             if (session!=null) {
                 session.close();
             }
@@ -212,8 +222,7 @@ public class SchoolDao implements AutoCloseable{
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
 
-            Query theQuery =
-                    session.createQuery("delete from Student where id=:studentId");
+            Query theQuery = session.createQuery(REMOVE_STUDENT);
             theQuery.setParameter("studentId", studentId);
 
             theQuery.executeUpdate();
@@ -233,7 +242,7 @@ public class SchoolDao implements AutoCloseable{
             Transaction transaction = session.beginTransaction();
 
             Query theQuery =
-                    session.createQuery("delete from Subject where id=:subjectId");
+                    session.createQuery(REMOVE_SUBJECT);
             theQuery.setParameter("subjectId", subjectId);
 
             theQuery.executeUpdate();

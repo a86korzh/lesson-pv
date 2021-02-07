@@ -6,6 +6,7 @@ import com.korzh86a.lessons.pv.entity.Mark;
 import com.korzh86a.lessons.pv.entity.Student;
 import com.korzh86a.lessons.pv.entity.Subject;
 import com.korzh86a.lessons.pv.entity.SubjectWithMarks;
+import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -20,8 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Configurable
 public class SchoolServlet extends HttpServlet {
@@ -146,7 +145,7 @@ public class SchoolServlet extends HttpServlet {
 
 		checkStudent(student);
 
-		schoolDao.addSchoolObject(student);
+		schoolDao.addSchoolDao(student);
 
 		resp.sendRedirect("list");
 	}
@@ -163,65 +162,12 @@ public class SchoolServlet extends HttpServlet {
 				throw new SchoolDaoException("enter correct entered year");
 			}
 
-			if (!validateDate(student.getBirthDate())) {
+			if (!GenericValidator.isDate(student.getBirthDate(), "yyyy-MM-dd", true)) {
 				throw new SchoolDaoException("enter correct birth date");
 			}
 
 		} catch (NumberFormatException e) {
 			throw new SchoolDaoException("enter correct entered year");
-		}
-	}
-
-	private boolean validateDate (String date){
-		Pattern pattern = Pattern.compile("((19|20)\\d\\d)[-](0?[1-9]|[12][0-9]|3[01])[-](0?[1-9]|1[012])");
-		Matcher matcher = pattern.matcher(date);
-
-		if(matcher.matches()){
-			matcher.reset();
-
-			if(matcher.find()){
-				String day = matcher.group(3);
-				String month = matcher.group(2);
-				int year = Integer.parseInt(matcher.group(1));
-
-				if (day.equals("31") &&
-						(month.equals("4") || month .equals("6") || month.equals("9") ||
-								month.equals("11") || month.equals("04") || month .equals("06") ||
-								month.equals("09"))) {
-					return false;
-				}
-
-				else if (month.equals("2") || month.equals("02")) {
-					if(year % 4==0){
-						if(day.equals("30") || day.equals("31")){
-							return false;
-						}
-						else{
-							return true;
-						}
-					}
-					else{
-
-						if(day.equals("29")||day.equals("30")||day.equals("31")){
-							return false;
-						}
-						else{
-							return true;
-						}
-					}
-				}
-
-				else{
-					return true;
-				}
-			}
-
-			else{
-				return false;
-			}
-		}
-		else{
-			return false;
 		}
 	}
 
@@ -235,7 +181,7 @@ public class SchoolServlet extends HttpServlet {
 			throws IOException, SchoolDaoException {
 		Subject subject = new Subject(req.getParameter("subject"));
 
-		schoolDao.addSchoolObject(subject);
+		schoolDao.addSchoolDao(subject);
 
 		resp.sendRedirect("/allSubjects");
 	}
@@ -262,7 +208,8 @@ public class SchoolServlet extends HttpServlet {
 		student.setId(Integer.parseInt(req.getParameter("id")));
 		checkStudent(student);
 
-		schoolDao.updateSchoolDao(student);
+		System.out.println(student);
+		schoolDao.updateStudent(student);
 
 		resp.sendRedirect("list");
 	}
@@ -283,7 +230,7 @@ public class SchoolServlet extends HttpServlet {
 		subject.setId(Integer.parseInt(req.getParameter("id")));
 		subject.setSubjectName(req.getParameter("subject"));
 
-		schoolDao.updateSchoolDao(subject);
+		schoolDao.updateSubject(subject);
 
 		resp.sendRedirect("/allSubjects");
 	}
@@ -316,7 +263,7 @@ public class SchoolServlet extends HttpServlet {
 		marks.setSubject(subject);
 		marks.setMarks(markList);
 
-		schoolDao.addSchoolObject(marks);
+		schoolDao.addSchoolDao(marks);
 
 		RequestDispatcher dispatcher = req.getRequestDispatcher("/getStudentMarksById?id="
 				+ req.getParameter("studentId"));

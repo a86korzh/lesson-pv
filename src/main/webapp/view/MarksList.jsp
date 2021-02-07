@@ -1,6 +1,10 @@
+<%@ page import="com.korzh86a.lessons.pv.entity.Subject" %>
+<%@ page import="com.korzh86a.lessons.pv.entity.Mark" %>
+<%@ page import="java.util.*" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <html>
 <head>
     <title>School Application</title>
@@ -36,9 +40,19 @@
 </div>
 <br>
 <div align="center">
+    <%
+        Set<Subject> currentStudentSubjects = ((HashMap<Subject, List<Mark>>)request.getAttribute("allMarks"))
+                .keySet();
+        List<Subject> subjects = (ArrayList<Subject>) request.getAttribute("allSubjects");
+
+        for (Subject s : currentStudentSubjects) {
+            System.out.println(subjects.remove(s));
+        }
+    %>
+
     <form action = "addSubjectToStudent" method = "GET">
-        <select name="subjectId" >
-            <c:forEach items="${allSubjects}" var="subject">
+        <select name="subjectId">
+            <c:forEach items="<%=subjects%>" var="subject">
                 <option value="${subject.id}">
                         ${subject.subjectName}
                 </option>

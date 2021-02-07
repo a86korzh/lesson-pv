@@ -17,6 +17,8 @@ src/main/resources/hibernate.cfg.xml
 
 # etc
 notes.docx
+src/test/java/Main.java
+src/test/java/FillTestDB.java
 
 #git
 .git
