@@ -6,9 +6,11 @@
 	<title>School Application</title>
     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
+
 <body>
 	<div style="text-align: center;">
 		<h1>Student Management</h1>
+
         <h2>
         	<a href="newStudent">Add New Student</a>
         	&nbsp;
@@ -19,10 +21,21 @@
             <a href="allSubjects">List All Subjects</a>
         </h2>
 	</div>
+
     <div align="center">
+        <script>
+            $.ajax({
+                url: "getStudentAmount",
+                success: function(data){
+                    document.getElementById("countOfStudents").innerHTML = "Count of Students: " + data;
+                }
+            });
+        </script>
+
         <table border="1" cellpadding="5">
             <caption><h2>List of Students</h2></caption>
-            <caption><h3>Count of Students: <c:out value='${studentsAmount}' /></h3></caption>
+
+            <caption><h3 id="countOfStudents"></h3></caption>
 
             <tr>
                 <th>ID</th>
@@ -31,6 +44,7 @@
                 <th>Birthdate</th>
                 <th>Enter year</th>
             </tr>
+
             <c:forEach var="student" items="${studentsList}">
                 <tr>
                     <td><c:out value="${student.id}" /></td>
@@ -49,7 +63,9 @@
             </c:forEach>
         </table>
     </div>
+
     <br>
+
     <div align="center">
         <form action = "list" method = "GET">
             <label for="representedStudentsAmountId">Choose number of students for displaying:</label>
@@ -66,6 +82,7 @@
     </div>
 
     <br>
+
     <script>
         let studentsAmount = Number(${studentsAmount});
         let actualPageFirstRow = Number(${actualPageFirstRow});

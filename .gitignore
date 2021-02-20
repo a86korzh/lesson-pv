@@ -22,3 +22,11 @@ src/test/java/FillTestDB.java
 
 #git
 .git
+
+# build
+build/base
+build/trash
+build/packs
+build/mysql-data
+
+

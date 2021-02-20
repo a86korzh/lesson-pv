@@ -52,6 +52,7 @@ public class SchoolServlet extends HttpServlet {
 
 		try {
 			switch (action) {
+				case "/getStudentAmount" -> getStudentAmount(req, resp);
 				case "/newStudent" -> showNewStudentForm(req, resp);
 				case "/addStudent" -> addStudent(req, resp);
 				case "/editStudent" -> showEditStudentForm(req, resp);
@@ -70,6 +71,15 @@ public class SchoolServlet extends HttpServlet {
 		} catch (SchoolDaoException throwables) {
 			throw new ServletException("Ошибка с доступом к базе данных", throwables);
 		}
+	}
+
+	private void getStudentAmount(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException, SchoolDaoException {
+		long studentsAmount = schoolDao.getStudentAmount();
+
+		resp.setContentType("text/plain");
+		resp.setCharacterEncoding("UTF-8");
+		resp.getWriter().write(studentsAmount+"");
 	}
 
 	private void allStudents(HttpServletRequest req, HttpServletResponse resp)
