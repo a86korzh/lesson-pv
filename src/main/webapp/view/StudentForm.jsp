@@ -38,7 +38,7 @@
             </caption>
         		<c:if test="${student != null}">
         			<input type="hidden" name="id" value="<c:out value='${student.id}' />" />
-        		</c:if>            
+        		</c:if>
             <tr>
                 <th>Name: </th>
                 <td>

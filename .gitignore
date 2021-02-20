@@ -1,9 +1,7 @@
 # Maven
 target
-META-INF
-
-# Ignore Gradle GUI config
-gradle-app.setting
+lib
+.run
 
 # IntelliJ
 .idea
@@ -15,7 +13,20 @@ gradle-app.setting
 *.log
 
 # pass
-src/main/resources/app.properties
+src/main/resources/hibernate.cfg.xml
+
+# etc
+notes.docx
+src/test/java/Main.java
+src/test/java/FillTestDB.java
 
 #git
 .git
+
+# build
+build/base
+build/trash
+build/packs
+build/mysql-data
+
+

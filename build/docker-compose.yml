@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  database:
+    container_name: mysql
+    image: mysql
+    volumes:
+      - ./base/fill_db.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1478
+      MYSQL_DATABASE: school
+
+  web:
+    depends_on:
+      - database
+    container_name: tomcat
+    build: .
+    ports:
+      - "8088:8080"
+    expose:
+      - 8088
+    environment:
+      MYSQL_ROOT_PASSWORD: 1478
+      MYSQL_DATABASE: school
+      MYSQL_HOST: mysql
+
