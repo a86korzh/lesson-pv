@@ -27,7 +27,7 @@
             $.ajax({
                 url: "getStudentAmount",
                 success: function(data){
-                    document.getElementById("countOfStudents").innerHTML = "Count of Students: " + data;
+                    document.getElementById("countOfStudents").innerHTML = data;
                 }
             });
         </script>
@@ -35,7 +35,7 @@
         <table border="1" cellpadding="5">
             <caption><h2>List of Students</h2></caption>
 
-            <caption><h3 id="countOfStudents"></h3></caption>
+            <caption><h3>Count of Students:  <b id="countOfStudents"></b></h3></caption>
 
             <tr>
                 <th>ID</th>
